@@ -1,0 +1,31 @@
+name: Atualizar Ofertas Shopee Diariamente
+
+on:
+  schedule:
+    # Roda todos os dias às 08:00 no horário de Brasília (11:00 UTC)
+    - cron: '0 11 * * *'
+  workflow_dispatch: # Permite rodar manualmente pelo botão no GitHub quando quiser testar
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar o código do repositório
+        uses: actions/checkout@v3
+
+      - name: Configurar o Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Executar script de ofertas
+        run: python atualizar_ofertas.py
+
+      - name: Salvar alterações no repositório
+        run: |
+          git config --global user.name 'Bot de Ofertas'
+          git config --global user.email 'bot@github.com'
+          git add produtos.json
+          git commit -m "Atualização automática de ofertas [skip ci]" || exit 0
+          git push
